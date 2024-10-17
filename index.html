@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דף נחיתה לפודקאסט - פרק חדש</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body dir="rtl">
+    <div class="container">
+        <img class="image2" src="לוגו סלייס 2.jpg">
+        <h1>Sliced Podcast</h1>
+        <h2>על פיקוד במילואים</h2>
+        <hr>
+        <h3>פרק 5 - פיקוד הוא מרחב היצירה שלי</h3>
+        <div class="bottom" style="text-align: center;">
+           <center><iframe id="player" width="370" height="208" src="https://www.youtube.com/embed/O1OrG-2FsQQ?enablejsapi=1&autoplay=1" title="YouTube video player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></center>
+        </div>
+        <div class="grid">
+            <a class="box" data-start="0" data-end="87">
+                <h2>פתיח והקדמה</h2>
+                <p>00:00 - 01:27</p>
+            </a>
+            <a class="box" data-start="87" data-end="255">
+                <h2>היכרות עם דן</h2>
+                <p>01:27 - 04:15</p>
+            </a>
+            <a class="box" data-start="255" data-end="465">
+                <h2>ה-7 באוקטובר</h2>
+                <p>04:15 - 07:45</p>
+            </a>
+            <a class="box" data-start="465" data-end="885">
+                <h2>אתגרי הפיקוד</h2>
+                <p>07:45 - 14:45</p>
+            </a>
+            <a class="box" data-start="885" data-end="1230">
+                <h2>שמירת נורמות מבצעיות</h2>
+                <p>14:45 - 20:30</p>
+            </a>
+            <a class="box" data-start="1230" data-end="1800">
+                <h2>קשר אישי ומנהיגות</h2>
+                <p>20:30 - 30:00</p>
+            </a>
+            <a class="box" data-start="1800" data-end="2250">
+                <h2>פיתוח צוות פיקודי</h2>
+                <p>30:00 - 37:30</p>
+            </a>
+            <a class="box" data-start="2250" data-end="2760">
+                <h2>התמודדות עם אובדן</h2>
+                <p>37:30 - 46:00</p>
+            </a>
+            <a class="box" data-start="2760" data-end="3589">
+                <h2>תובנות וסיכום</h2>
+                <p>46:00 - 59:49</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- טעינת YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let endTime = null;
+        let checkInterval = null;
+
+        // פונקציה זו חייבת להיות בתחום הגלובלי
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // התחלת הסרטון באופן אוטומטי ללא השתקה
+            player.playVideo();
+
+            const sectionLinks = document.querySelectorAll('.box');
+            sectionLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); // מניעת התנהגות ברירת מחדל של הקישור
+                    const startTime = parseInt(link.getAttribute('data-start'));
+                    endTime = parseInt(link.getAttribute('data-end'));
+                    player.seekTo(startTime, true);
+                    player.playVideo();
+
+                    // אם יש טיימר פעיל, ננקה אותו
+                    if (checkInterval) {
+                        clearInterval(checkInterval);
+                    }
+
+                    // נבדוק כל שנייה אם הגענו לזמן הסיום
+                    checkInterval = setInterval(() => {
+                        if (player.getCurrentTime() >= endTime) {
+                            player.pauseVideo();
+                            clearInterval(checkInterval);
+                        }
+                    }, 1000);
+                });
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            // אם הסרטון נעצר או הסתיים, ננקה את הטיימר
+            if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
